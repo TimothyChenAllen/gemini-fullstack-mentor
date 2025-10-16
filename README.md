@@ -27,3 +27,11 @@ on my own.
 
 **Objective**. Use the hook `useState` to preserve the state of the user's favorite language
 and set values in a controlled input.
+
+## Lesson 4. Read data from an API
+
+**Objective**. Read data from an existing API
+
+Admittedly this is a big jump, but I started to just go with it when the stacker-mentor
+proposed it. This reaches out to https://jsonplaceholder.typicode.com/todos/1 and fetches
+JSON from it.
