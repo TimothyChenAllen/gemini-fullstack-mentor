@@ -23,4 +23,7 @@ npm create vite@latest client-app -- --template react-ts
 Rather than use the template code, I wanted to learn how to create a working `App.tsx` file
 on my own.
 
+## Lesson 3. Preserve and use state
 
+**Objective**. Use the hook `useState` to preserve the state of the user's favorite language
+and set values in a controlled input.
