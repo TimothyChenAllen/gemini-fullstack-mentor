@@ -1,4 +1,19 @@
+package.json
 package-lock.json
+
+# Vim swap files
+*.swp
+*.swo
+*.swn
+
+# Vim backup files
+*~
+
+# Vim session files (if used)
+Session.vim
+
+# Netrw history file (if used)
+.netrwhist
 
 # Logs
 logs
