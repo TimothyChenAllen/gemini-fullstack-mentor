@@ -44,3 +44,5 @@ client app to read from our API server.
 ## Lesson 6. Connect sqlite database to the API Server
 
 **Objective**. Learn to connect a database to the API
+
+## Lesson 7. Create users and encrypt a password
