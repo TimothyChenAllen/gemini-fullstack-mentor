@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import sqlite3 from 'sqlite3';
+import bcrypt from 'bcrypt';
 
 // Initialize the Express application
 const app = express();
@@ -17,19 +18,29 @@ const db = new sqlite3.Database('./app.db', sqlite3.OPEN_READWRITE | sqlite3.OPE
 
 // Define the Schema
 db.serialize(() => {
+  // Our existing 'languages' table
   db.run(`
     CREATE TABLE IF NOT EXISTS languages (
-       id INTEGER PRIMARY KEY AUTOINCREMENT,
-       name TEXT NOT NULL,
-       coolness INTEGER
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      coolness INTEGER
     )
-    `, (err) => {
-       if (err) {
-          console.error('Error creating table:', err.message);
-       } else {
-          console.log('Table "languages" is ready.');
-       }
-    });
+  `);
+
+  // The new 'users' table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT NOT NULL UNIQUE,
+      password_hash TEXT NOT NULL
+    )
+  `, (err) => {
+    if (err) {
+      console.error('Error creating users table:', err.message);
+    } else {
+      console.log('Table "users" is ready.');
+    }
+  });
 });
 
 // Add Middleware
@@ -40,6 +51,39 @@ app.use(express.json());
 // It listens for GET requests at the path '/api/greeting'.
 app.get('/api/greeting', (req: Request, res: Response) => {
   res.json({ text: "Hello from the Al-Khwarizmi/Ellis/Codd collaborative server!", timestamp: new Date().toISOString() });
+});
+
+// --- Step 3: Create /register Endpoint ---
+app.post('/api/register', async (req: Request, res: Response) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ error: "Username and password are required." });
+  }
+
+  try {
+    // We must "probabilistically" hash the password.
+    // '10' is the "salt round" - a measure of hashing complexity.
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    // Now we store the hash, NOT the password.
+    const sql = "INSERT INTO users (username, password_hash) VALUES (?, ?)";
+    
+    // We use .run() and a callback to handle potential UNIQUE constraint errors
+    db.run(sql, [username, passwordHash], function(err) {
+      if (err) {
+        if (err.message.includes("UNIQUE constraint failed")) {
+          return res.status(400).json({ error: "Username already taken." });
+        }
+        return res.status(500).json({ error: err.message });
+      }
+      // Send back the new user's ID
+      res.status(201).json({ id: this.lastID, username });
+    });
+
+  } catch (err) {
+    res.status(500).json({ error: "Server error during registration." });
+  }
 });
 
 // GET all languages
