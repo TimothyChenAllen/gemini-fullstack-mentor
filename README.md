@@ -35,3 +35,8 @@ and set values in a controlled input.
 Admittedly this is a big jump, but I started to just go with it when the stacker-mentor
 proposed it. This reaches out to https://jsonplaceholder.typicode.com/todos/1 and fetches
 JSON from it.
+
+## Lesson 5. Create our own API server and connect the client
+
+**Objective**. Create a simple server with its own API, and connect our existing
+client app to read from our API server.

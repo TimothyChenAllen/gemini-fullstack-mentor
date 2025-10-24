@@ -3,11 +3,9 @@ import './App.css';
 
 // A type definition for the data we expect to receive.
 // This is a key benefit of TypeScript!
-interface Todo {
-  userId: number;
-  id: number;
-  title: string;
-  completed: boolean;
+interface Greeting {
+  text: string;
+  timestamp: string;
 }
 
 function App() {
@@ -22,7 +20,7 @@ function App() {
   // The empty array [] at the end means it will only run ONCE.
   useEffect(() => {
     // Step 1: Initiate the request to the URL.
-    fetch('https://jsonplaceholder.typicode.com/todos/1')
+    fetch('http://localhost:3001/api/greeting')
       // Step 2: Handle the initial response.
       .then(response => {
         // If the response is not 'ok' (e.g., status 404 or 500), throw an error.
