@@ -40,3 +40,7 @@ JSON from it.
 
 **Objective**. Create a simple server with its own API, and connect our existing
 client app to read from our API server.
+
+## Lesson 6. Connect sqlite database to the API Server
+
+**Objective**. Learn to connect a database to the API
