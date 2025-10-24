@@ -46,3 +46,5 @@ client app to read from our API server.
 **Objective**. Learn to connect a database to the API
 
 ## Lesson 7. Create users and encrypt a password
+
+## Lesson 8. Create a JWT on successful login

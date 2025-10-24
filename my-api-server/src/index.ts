@@ -2,10 +2,12 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import sqlite3 from 'sqlite3';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 // Initialize the Express application
 const app = express();
 const PORT = 3001; // We choose a port for our server to listen on
+const JWT_SECRET = "your-super-secret-key-that-no-one-knows";
 
 // Connect to (or create) the SQLite database
 const db = new sqlite3.Database('./app.db', sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
@@ -53,7 +55,53 @@ app.get('/api/greeting', (req: Request, res: Response) => {
   res.json({ text: "Hello from the Al-Khwarizmi/Ellis/Codd collaborative server!", timestamp: new Date().toISOString() });
 });
 
-// --- Step 3: Create /register Endpoint ---
+// LESSON 08 
+app.post('/api/login', (req: Request, res: Response) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ error: "Username and password are required." });
+  }
+
+  // Step 4: Find the user in the database
+  const sql = "SELECT * FROM users WHERE username = ?";
+  
+  // Use db.get() to find a single row
+  db.get(sql, [username], async (err, user) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+
+    // Step 5 & 6: User not found or password doesn't match
+    if (!user) {
+      return res.status(401).json({ error: "Invalid username or password." });
+    }
+
+    // Now, compare the provided password with the stored hash
+    const passwordMatch = await bcrypt.compare(password, user.password_hash);
+
+    if (!passwordMatch) {
+      return res.status(401).json({ error: "Invalid username or password." });
+    }
+
+    // --- Step 7: Generate JWT (Success!) ---
+    // The user is authenticated! Create a passport for them.
+    // We'll put the user's ID in the token "payload".
+    const payload = { userId: user.id };
+
+    // Sign the token with our secret key. It will expire in 1 hour.
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
+
+    // Step 8: Send the token to the client
+    res.json({
+      message: "Login successful!",
+      token: token,
+      username: user.username
+    });
+  });
+});
+
+
 app.post('/api/register', async (req: Request, res: Response) => {
   const { username, password } = req.body;
 
